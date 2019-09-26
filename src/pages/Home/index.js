@@ -15,6 +15,7 @@ import Card from './components/Card';
 import Loading from '@/components/Loading';
 import {getDocs} from '@/services/doc';
 import {scaleSizeW} from '@/utils/utils';
+import config from '@/config';
 
 const ITEM_HEIGHT = scaleSizeW(220);
 
@@ -162,9 +163,9 @@ export default class Home extends Component {
           onChangeTab={this.onChangeTab}
           initialPage={1}
           scrollWithoutAnimation={true}
-          tabBarUnderlineStyle={{backgroundColor: '#158bb8'}}
+          tabBarUnderlineStyle={{backgroundColor: config.themeColor}}
           tabBarBackgroundColor="#FFFFFF"
-          tabBarActiveTextColor="#158bb8"
+          tabBarActiveTextColor={config.themeColor}
           tabBarInactiveTextColor="#999"
           tabBarTextStyle={{fontSize: scaleSizeW(34)}}>
           {tabs.map((e, i) => (

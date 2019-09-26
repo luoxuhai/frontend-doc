@@ -5,14 +5,84 @@ import {
   StyleSheet,
   Modal,
   TouchableNativeFeedback,
-  Button,
+  TouchableWithoutFeedback,
   Share,
   ToastAndroid,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import Spinner from 'react-native-spinkit';
-import {Menu, Divider, Provider, Appbar} from 'react-native-paper';
 import {scaleSizeW, getScreenH} from '@/utils/utils';
+import config from '@/config';
+
+class PaperMenu extends PureComponent {
+  state = {
+    modalVisible: false,
+  };
+
+  setModalVisible(visible) {
+    this.setState({modalVisible: visible});
+  }
+
+  onShare = async () => {
+    // const {describe, name} = this.props.navigation.state.params;
+    await Share.share({
+      title: 'web前端中文文档',
+      message:
+        '深入挖掘国外前端新领域，为中国 Web 前端开发人员提供优质文档！APP下载: https://coolapk.com/apk/org.frontend.doc',
+    });
+
+    this.setState({modalVisible: false});
+  };
+
+  render() {
+    return (
+      <Fragment>
+        <TouchableNativeFeedback
+          onPress={() => {
+            this.setModalVisible(true);
+          }}>
+          <View style={{justifyContent: 'center', marginRight: scaleSizeW(20), padding: scaleSizeW(20)}}>
+            <Text style={{fontSize: scaleSizeW(34), color: '#fff'}}>更多</Text>
+          </View>
+        </TouchableNativeFeedback>
+
+        <Modal
+          animationType="fade"
+          transparent
+          hardwareAccelerated
+          onRequestClose={() => this.setModalVisible(false)}
+          visible={this.state.modalVisible}>
+          <TouchableWithoutFeedback onPress={() => this.setModalVisible(false)}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              }}>
+              <View style={styles.modalContainer}>
+                <TouchableNativeFeedback
+                  onPress={() => {
+                    ToastAndroid.show('已收藏!', ToastAndroid.SHORT);
+                  }}>
+                  <View style={styles.button}>
+                    <Text style={styles.buttonText}>收藏</Text>
+                  </View>
+                </TouchableNativeFeedback>
+                <TouchableNativeFeedback
+                  onPress={() => {
+                    this.onShare();
+                  }}>
+                  <View style={styles.button}>
+                    <Text style={styles.buttonText}>分享</Text>
+                  </View>
+                </TouchableNativeFeedback>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </Fragment>
+    );
+  }
+}
 
 export default class Doc extends PureComponent {
   constructor(props) {
@@ -30,28 +100,14 @@ export default class Doc extends PureComponent {
   static navigationOptions = ({navigation}) => ({
     title: navigation.getParam('title'),
     headerStyle: {
-      backgroundColor: '#158bb8',
+      backgroundColor: config.themeColor,
     },
     headerRight: (
-      <Menu
-      // onDismiss={this._closeMenu}
-      // anchor={<Text onPress={this._openMenu}>KK</Text>}
-      >
-        <Menu.Item onPress={() => {}} title="Item 1" />
-        <Menu.Item onPress={() => {}} title="Item 2" />
-        <Divider />
-        <Menu.Item onPress={() => {}} title="Item 3" />
-      </Menu>
+      <View style={{flex: 1}}>
+        <PaperMenu />
+      </View>
     ),
   });
-
-  onShare = async () => {
-    const {describe, name} = this.props.navigation.state.params;
-    await Share.share({
-      title: 'web前端中文文档',
-      message: `${name}: ${describe}`,
-    });
-  };
 
   render() {
     const {isVisible} = this.state;
@@ -60,9 +116,9 @@ export default class Doc extends PureComponent {
       <Fragment>
         <Spinner
           isVisible={isVisible}
-          size={50}
+          size={scaleSizeW(50)}
           type="CircleFlip"
-          color="#1ABC9C"
+          color={config.themeColor}
           accessibilityLabel="加载中"
           style={styles.spinner}
         />
@@ -89,7 +145,32 @@ const styles = StyleSheet.create({
   spinner: {
     position: 'absolute',
     left: scaleSizeW(750 / 2 - 25),
-    top: getScreenH() / 2 - 100,
+    top: getScreenH() / 2 - scaleSizeW(100),
     zIndex: 999,
+  },
+
+  modalContainer: {
+    position: 'absolute',
+    top: getScreenH() / 2 - scaleSizeW(110),
+    left: scaleSizeW(750 / 2 - 200),
+    width: scaleSizeW(400),
+    height: scaleSizeW(220),
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderRadius: 10,
+    elevation: 4,
+    backgroundColor: '#fff',
+  },
+
+  button: {
+    width: scaleSizeW(400),
+    height: scaleSizeW(80),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: '#000',
+    fontSize: scaleSizeW(34),
   },
 });
