@@ -49,13 +49,14 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: scaleSizeW(140),
-    height: scaleSizeW(140),
+    width: scaleSizeW(130),
+    height: scaleSizeW(130),
   },
 
   descContainer: {
     flex: 1,
-    marginLeft: scaleSizeW(10),
+    marginLeft: scaleSizeW(30),
+    justifyContent: 'space-between',
   },
 
   desc: {
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
 
   name: {
     marginBottom: scaleSizeW(10),
-    fontSize: scaleSizeW(34),
+    fontSize: scaleSizeW(36),
     fontWeight: '500',
     color: config.themeColor,
   },

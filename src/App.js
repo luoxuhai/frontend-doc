@@ -1,4 +1,5 @@
 import * as React from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import App from './routes';
 import './utils/storage';
 // import 'frontend-doc/mock';
@@ -16,6 +17,7 @@ export default class Main extends React.Component {
           data: [],
         });
       });
+    setTimeout(SplashScreen.hide, 1500);
   }
   render() {
     return <App />;
