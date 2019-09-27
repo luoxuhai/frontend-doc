@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Share,
   ToastAndroid,
+  BackHandler,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import Spinner from 'react-native-spinkit';
@@ -17,11 +18,89 @@ import config from '@/config';
 class PaperMenu extends PureComponent {
   state = {
     modalVisible: false,
+    isStar: false,
   };
+
+  docId = '';
+
+  componentDidMount() {
+    global.storage
+      .load({
+        key: 'stars',
+        autoSync: false,
+      })
+      .then(stars => {
+        global.storage
+          .load({
+            key: 'docId',
+            autoSync: false,
+          })
+          .then(id => {
+            this.docId = id;
+            if (stars.includes(id)) {
+              this.setState({
+                isStar: true,
+              });
+            }
+          });
+      })
+      .catch(() => {});
+  }
 
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
+
+  onStar = () => {
+    if (this.state.isStar) {
+      global.storage
+        .load({
+          key: 'stars',
+          autoSync: false,
+        })
+        .then(stars => {
+          console.log(this.docId);
+          global.storage.save({
+            key: 'stars',
+            data: stars.filter(e => e !== this.docId),
+          });
+          ToastAndroid.show('已取消收藏!', ToastAndroid.SHORT);
+          this.setState({modalVisible: false, isStar: true});
+        });
+    } else {
+      global.storage
+        .load({
+          key: 'docId',
+          autoSync: false,
+        })
+        .then(res => {
+          global.storage
+            .load({
+              key: 'stars',
+              autoSync: false,
+            })
+            .then(stars => {
+              global.storage.save({
+                key: 'stars',
+                data: Array.from(new Set([res, ...stars])),
+              });
+              ToastAndroid.show('已收藏!', ToastAndroid.SHORT);
+              this.setState({modalVisible: false, isStar: true});
+            })
+            .catch(() => {
+              global.storage.save({
+                key: 'stars',
+                data: [res],
+              });
+              ToastAndroid.show('已收藏!', ToastAndroid.SHORT);
+              this.setState({modalVisible: false, isStar: true});
+            });
+        })
+        .catch(err => {
+          console.warn(err.message);
+        });
+    }
+  };
 
   onShare = async () => {
     // const {describe, name} = this.props.navigation.state.params;
@@ -41,7 +120,12 @@ class PaperMenu extends PureComponent {
           onPress={() => {
             this.setModalVisible(true);
           }}>
-          <View style={{justifyContent: 'center', marginRight: scaleSizeW(20), padding: scaleSizeW(20)}}>
+          <View
+            style={{
+              justifyContent: 'center',
+              marginRight: scaleSizeW(20),
+              padding: scaleSizeW(20),
+            }}>
             <Text style={{fontSize: scaleSizeW(34), color: '#fff'}}>更多</Text>
           </View>
         </TouchableNativeFeedback>
@@ -59,12 +143,11 @@ class PaperMenu extends PureComponent {
                 backgroundColor: 'rgba(0,0,0,0.5)',
               }}>
               <View style={styles.modalContainer}>
-                <TouchableNativeFeedback
-                  onPress={() => {
-                    ToastAndroid.show('已收藏!', ToastAndroid.SHORT);
-                  }}>
+                <TouchableNativeFeedback onPress={() => this.onStar()}>
                   <View style={styles.button}>
-                    <Text style={styles.buttonText}>收藏</Text>
+                    <Text style={styles.buttonText}>
+                      {this.state.isStar ? '取消收藏' : '收藏'}
+                    </Text>
                   </View>
                 </TouchableNativeFeedback>
                 <TouchableNativeFeedback
@@ -93,10 +176,6 @@ export default class Doc extends PureComponent {
     };
   }
 
-  setModalVisible = visible => {
-    this.setState({modalVisible: visible});
-  };
-
   static navigationOptions = ({navigation}) => ({
     title: navigation.getParam('title'),
     headerStyle: {
@@ -108,6 +187,29 @@ export default class Doc extends PureComponent {
       </View>
     ),
   });
+
+  componentDidMount() {
+    const {_id} = this.props.navigation.state.params;
+    global.storage.save({
+      key: 'docId',
+      data: _id,
+    });
+    BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+  }
+
+  onBackAndroid = () => {
+    const {goBack, setParams} = this.props.navigation;
+    setParams({a: '回调参数'});
+    goBack();
+  };
+
+  setModalVisible = visible => {
+    this.setState({modalVisible: visible});
+  };
 
   render() {
     const {isVisible} = this.state;
@@ -151,13 +253,13 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     position: 'absolute',
-    top: getScreenH() / 2 - scaleSizeW(110),
+    top: getScreenH() / 2 - scaleSizeW(120),
     left: scaleSizeW(750 / 2 - 200),
     width: scaleSizeW(400),
-    height: scaleSizeW(220),
+    height: scaleSizeW(240),
     justifyContent: 'space-around',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: scaleSizeW(10),
     elevation: 4,
     backgroundColor: '#fff',
   },

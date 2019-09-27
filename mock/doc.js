@@ -11,12 +11,12 @@ const url = [
   'https://weex.apache.org/zh/guide/introduction.html',
 ];
 
-export const doc = Mock.mock('https://mock.com/docs', (options) => {
-  console.log();
+export const doc = Mock.mock('http://127.0.0.1:8089/v1/docs', (options) => {
+  console.log(options);
   return Mock.mock({
     'docs|10-50': [
       {
-        '_id|+1': 100,
+        '_id|+1': 100000,
         name: '@cname',
         'describe|3-4': '@csentence',
         'logo|1': logos,

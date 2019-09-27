@@ -3,6 +3,7 @@ import {Text, View, StyleSheet, TouchableNativeFeedback} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import PropTypes from 'prop-types';
 import {scaleSizeW} from '@/utils/utils';
+import config from '@/config';
 
 export default class Card extends Component {
   static propTypes = {
@@ -10,9 +11,9 @@ export default class Card extends Component {
     doc: PropTypes.object,
   }
   render() {
-    const { url, name, describe, logo } = this.props.doc;
+    const { url, name, describe, logo, _id } = this.props.doc;
     return (
-      <TouchableNativeFeedback onPress={() => this.props.onEnterClick(url, name, describe)}>
+      <TouchableNativeFeedback onPress={() => this.props.onEnterClick(_id, url, name, describe)}>
         <View style={styles.container}>
           <FastImage
             style={styles.logo}
@@ -67,6 +68,6 @@ const styles = StyleSheet.create({
     marginBottom: scaleSizeW(10),
     fontSize: scaleSizeW(34),
     fontWeight: '500',
-    color: '#0094FF',
+    color: config.themeColor,
   },
 });

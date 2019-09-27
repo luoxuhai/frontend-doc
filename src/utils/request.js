@@ -4,12 +4,13 @@ import config from '@/config';
 const instance = axios.create({
     baseURL: config.BASE_URL,
     timeout: 6000,
-    headers: {}
+    headers: {},
 });
 
 //请求拦截处理
 instance.interceptors.request.use( config => {
     // 在发送请求之前做些什么
+    console.log(config);
     return config;
 }, function (error) {
     // 对请求错误做些什么

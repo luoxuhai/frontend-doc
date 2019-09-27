@@ -5,28 +5,10 @@ import config from '@/config';
 import Home from '../pages/Home';
 import Doc from '../pages/Doc';
 
-// const MaterialTopTabNavigator = createMaterialTopTabNavigator(
-//   {
-//     HomeScreen: {
-//       screen: Home,
-//     },
-//   },
-//   {
-//     initialRouteName: 'HomeScreen',
-//   },
-// );
-
 const StackNavigator = createStackNavigator(
   {
     HomeScreen: {
       screen: Home,
-      navigationOptions: () => ({
-        title: 'web前端中文文档',
-        headerStyle: {
-          elevation: 0,
-          backgroundColor: config.themeColor,
-        },
-      }),
     },
     DocScreen: {
       screen: Doc,
